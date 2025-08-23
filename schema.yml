@@ -1,8 +1,8 @@
 openapi: 3.0.3
 info:
-  title: Your Project API
+  title: Django Tests Project API
   version: 1.0.0
-  description: Your project description
+  description: Project dedicated to implement DRF POCs
 paths:
   /api/token/:
     post:
@@ -61,6 +61,21 @@ paths:
   /api/users/:
     get:
       operationId: users_list
+      parameters:
+      - in: query
+        name: is_active
+        schema:
+          type: boolean
+      - in: query
+        name: is_staff
+        schema:
+          type: boolean
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
       tags:
       - users
       security:

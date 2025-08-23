@@ -5,6 +5,7 @@ cffi==1.17.1
 charset-normalizer==3.4.3
 cryptography==45.0.6
 Django==5.2.5
+django-filter==25.1
 django-oauth-toolkit==3.0.1
 djangorestframework==3.16.1
 djangorestframework_simplejwt==5.5.1

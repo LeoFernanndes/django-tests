@@ -1,5 +1,6 @@
 from django.shortcuts import render
-from rest_framework import viewsets, permissions as drf_permissions
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters, viewsets, permissions as drf_permissions
 
 from users import models
 from users import permissions
@@ -8,6 +9,11 @@ from users import serializers
 
 class UserViewset(viewsets.ModelViewSet):
     queryset = models.User.objects.all()
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    # is_staff is not available on list serializer but keeps being available on filtering
+    filterset_fields = ['is_active', 'is_staff'] 
+    ordering_fields = ['date_joined']
+    ordering = ['-date_joined'] # overrides get_queryset ordering
     
     # TODO: check if there are better ways of setting permissions by action
     # TODO: check if this approach breaks any internal logic
@@ -24,3 +30,6 @@ class UserViewset(viewsets.ModelViewSet):
         elif self.action == 'update':
             return serializers.UserUpdateSerializer
         return serializers.UserSerializer
+
+    def get_queryset(self):
+        return super().get_queryset().order_by('date_joined') # order is overriden by ordering but filter keep being properly applied
