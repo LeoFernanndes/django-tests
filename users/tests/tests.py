@@ -44,3 +44,11 @@ class UserObjectsTestCase(TestCase):
         self.assertEqual(user.is_superuser, False)
         self.assertEqual(user.is_staff, False)
         self.assertEqual(user.is_active, True)
+
+
+class UserObjectsListTestCase(TestCase):
+    fixtures = ['users']
+
+    def test_fixtures_loading(self):
+        users = User.objects.all()
+        self.assertEqual(len(users), 20)
