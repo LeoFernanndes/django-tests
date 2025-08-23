@@ -1,4 +1,5 @@
 import datetime
+import uuid
 
 from django.contrib.auth import authenticate
 from django.contrib.auth.hashers import make_password
@@ -22,7 +23,6 @@ class UserObjectsTestCase(TestCase):
         auth_user = authenticate(username=user_data['username'], password=user_data['password'])
         
         {
-            'id': 1, 
             'password': 'pbkdf2_sha256$1000000$BDMgN5sYDl33viZ7sqBQGE$Obije75nTkF3GPfYocahK4ak6Sg131NVVoxUr5RD6Uw=', 
             'last_login': None, 
             'is_superuser': False, 
@@ -35,7 +35,7 @@ class UserObjectsTestCase(TestCase):
         }
         
         self.assertEqual(user, auth_user)
-        self.assertEqual(user.id, 1)
+        self.assertEqual(type(user.id), type(uuid.uuid4()))
         self.assertEqual(user.last_login, None)
         self.assertEqual(user.last_name, user_data['last_name'])
         self.assertEqual(user.username, user_data['username'])
@@ -51,4 +51,4 @@ class UserObjectsListTestCase(TestCase):
 
     def test_fixtures_loading(self):
         users = User.objects.all()
-        self.assertEqual(len(users), 20)
+        self.assertEqual(len(users), 149)

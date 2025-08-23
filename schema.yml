@@ -132,8 +132,9 @@ paths:
       - in: path
         name: id
         schema:
-          type: integer
-        description: A unique integer value identifying this user.
+          type: string
+          format: uuid
+        description: A UUID string identifying this user.
         required: true
       tags:
       - v1
@@ -152,8 +153,9 @@ paths:
       - in: path
         name: id
         schema:
-          type: integer
-        description: A unique integer value identifying this user.
+          type: string
+          format: uuid
+        description: A UUID string identifying this user.
         required: true
       tags:
       - v1
@@ -183,8 +185,9 @@ paths:
       - in: path
         name: id
         schema:
-          type: integer
-        description: A unique integer value identifying this user.
+          type: string
+          format: uuid
+        description: A UUID string identifying this user.
         required: true
       tags:
       - v1
@@ -214,8 +217,9 @@ paths:
       - in: path
         name: id
         schema:
-          type: integer
-        description: A unique integer value identifying this user.
+          type: string
+          format: uuid
+        description: A UUID string identifying this user.
         required: true
       tags:
       - v1
@@ -253,7 +257,8 @@ components:
       type: object
       properties:
         id:
-          type: integer
+          type: string
+          format: uuid
           readOnly: true
         last_login:
           type: string
@@ -320,7 +325,8 @@ components:
       type: object
       properties:
         id:
-          type: integer
+          type: string
+          format: uuid
           readOnly: true
         last_login:
           type: string
@@ -358,7 +364,8 @@ components:
       type: object
       properties:
         id:
-          type: integer
+          type: string
+          format: uuid
           readOnly: true
         password:
           type: string
@@ -388,7 +395,8 @@ components:
       type: object
       properties:
         id:
-          type: integer
+          type: string
+          format: uuid
           readOnly: true
         first_name:
           type: string

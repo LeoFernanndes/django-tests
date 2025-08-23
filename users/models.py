@@ -1,3 +1,5 @@
+import uuid
+
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.db import models
 
@@ -9,5 +11,6 @@ class CustomUserManager(UserManager):
 
 
 class User(AbstractUser):
-    
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
     objects = CustomUserManager()
