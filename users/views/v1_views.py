@@ -4,7 +4,7 @@ from rest_framework import filters, viewsets, pagination, permissions as drf_per
 
 from users import models
 from users import permissions
-from users import serializers
+from users.serializers import v1_serializers
 
 
 class DefaultPageNumberPaginationClass(pagination.PageNumberPagination):
@@ -33,10 +33,10 @@ class UserViewset(viewsets.ModelViewSet):
 
     def get_serializer_class(self):
         if self.action == 'create':
-            return serializers.UserCreateSerializer
+            return v1_serializers.UserCreateSerializer
         elif self.action == 'update':
-            return serializers.UserUpdateSerializer
-        return serializers.UserSerializer
+            return v1_serializers.UserUpdateSerializer
+        return v1_serializers.UserSerializer
 
     def get_queryset(self):
         return super().get_queryset().order_by('date_joined') # order is overriden by ordering but filter keep being properly applied

@@ -58,9 +58,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/TokenRefresh'
           description: ''
-  /api/users/:
+  /api/v1/users/:
     get:
-      operationId: users_list
+      operationId: v1_users_list
       parameters:
       - in: query
         name: is_active
@@ -89,7 +89,7 @@ paths:
         schema:
           type: integer
       tags:
-      - users
+      - v1
       security:
       - jwtAuth: []
       responses:
@@ -100,9 +100,9 @@ paths:
                 $ref: '#/components/schemas/PaginatedUserList'
           description: ''
     post:
-      operationId: users_create
+      operationId: v1_users_create
       tags:
-      - users
+      - v1
       requestBody:
         content:
           application/json:
@@ -125,9 +125,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserCreate'
           description: ''
-  /api/users/{id}/:
+  /api/v1/users/{id}/:
     get:
-      operationId: users_retrieve
+      operationId: v1_users_retrieve
       parameters:
       - in: path
         name: id
@@ -136,7 +136,7 @@ paths:
         description: A unique integer value identifying this user.
         required: true
       tags:
-      - users
+      - v1
       security:
       - jwtAuth: []
       responses:
@@ -147,7 +147,7 @@ paths:
                 $ref: '#/components/schemas/User'
           description: ''
     put:
-      operationId: users_update
+      operationId: v1_users_update
       parameters:
       - in: path
         name: id
@@ -156,7 +156,7 @@ paths:
         description: A unique integer value identifying this user.
         required: true
       tags:
-      - users
+      - v1
       requestBody:
         content:
           application/json:
@@ -178,7 +178,7 @@ paths:
                 $ref: '#/components/schemas/UserUpdate'
           description: ''
     patch:
-      operationId: users_partial_update
+      operationId: v1_users_partial_update
       parameters:
       - in: path
         name: id
@@ -187,7 +187,7 @@ paths:
         description: A unique integer value identifying this user.
         required: true
       tags:
-      - users
+      - v1
       requestBody:
         content:
           application/json:
@@ -209,7 +209,7 @@ paths:
                 $ref: '#/components/schemas/User'
           description: ''
     delete:
-      operationId: users_destroy
+      operationId: v1_users_destroy
       parameters:
       - in: path
         name: id
@@ -218,7 +218,7 @@ paths:
         description: A unique integer value identifying this user.
         required: true
       tags:
-      - users
+      - v1
       security:
       - jwtAuth: []
       responses:
