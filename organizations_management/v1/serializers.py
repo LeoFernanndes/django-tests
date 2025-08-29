@@ -19,3 +19,21 @@ class OrganizationSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Organization
         fields = '__all__'
+
+
+class ProjectCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Project
+        exclude = ['created_at', 'updated_at', 'organization']
+
+
+class ProjectUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Project
+        exclude = ['created_at', 'updated_at', 'organization']
+
+
+class ProjectSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Project
+        fields = '__all__'
