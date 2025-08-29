@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-8&pexttlbni=fn@d%@ncrxlu#p-byj%u8ris2266b6#3hi1e)(
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*'] # TODO: tighten wildcard when in production
 
 
 # Application definition
@@ -56,6 +56,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'root_project.middlewares.RequestLoggingMiddleware'
 ]
 
 ROOT_URLCONF = 'root_project.urls'
@@ -144,4 +145,35 @@ SPECTACULAR_SETTINGS = {
     'DESCRIPTION': 'Project dedicated to implement DRF POCs',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
+}
+
+
+DJANGO_LOG_LEVEL='DEBUG'
+LOGGING = {
+    'version': 1,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {funcName} {lineno} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose'
+        }
+    },
+    'loggers': {
+        'django.db.backends': {
+            # database interactions are only logged with DEBUG=True
+            'level': 'DEBUG',
+            'handlers': ['console'],
+        },
+        'my_debugger': {
+            # https://docs.python.org/3/howto/logging-cookbook.html#logging-cookbook
+            'level': 'DEBUG',
+            'handlers': ['console']
+        }
+    }
 }
