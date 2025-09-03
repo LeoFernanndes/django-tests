@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, viewsets, pagination, permissions as drf_permissions
+from rest_framework import filters, mixins, pagination, permissions as drf_permissions, viewsets
 
 from users import models
 from users import permissions
@@ -40,3 +40,12 @@ class UserViewset(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return super().get_queryset().order_by('date_joined') # order is overriden by ordering but filter keep being properly applied
+
+
+class UserUpdateSelf(mixins.UpdateModelMixin, viewsets.GenericViewSet):
+    queryset = models.User.objects.all()
+    serializer_class = v1_serializers.UserUpdateSelfSerializer
+    permission_classes = [permissions.SelfPermission]
+
+    # def get_queryset(self):
+    #     return super().get_queryset().filter(id=self.request.user.id)

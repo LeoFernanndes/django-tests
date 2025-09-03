@@ -12,5 +12,6 @@ class CustomUserManager(UserManager):
 
 class User(AbstractUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    main_profile_image_url = models.TextField(blank=True)
 
     objects = CustomUserManager()

@@ -253,14 +253,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Organization'
+              $ref: '#/components/schemas/OrganizationAddRemoveMember'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/Organization'
+              $ref: '#/components/schemas/OrganizationAddRemoveMember'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/Organization'
-        required: true
+              $ref: '#/components/schemas/OrganizationAddRemoveMember'
       security:
       - jwtAuth: []
       responses:
@@ -268,7 +267,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Organization'
+                $ref: '#/components/schemas/OrganizationAddRemoveMember'
           description: ''
   /api/v1/organizations/{organization_id}/projects:
     get:
@@ -820,6 +819,8 @@ components:
         date_joined:
           type: string
           format: date-time
+        main_profile_image_url:
+          type: string
     Project:
       type: object
       properties:
@@ -941,6 +942,8 @@ components:
         date_joined:
           type: string
           format: date-time
+        main_profile_image_url:
+          type: string
       required:
       - id
       - username
@@ -971,6 +974,8 @@ components:
           format: email
           title: Email address
           maxLength: 254
+        main_profile_image_url:
+          type: string
       required:
       - id
       - password
@@ -988,6 +993,8 @@ components:
         last_name:
           type: string
           maxLength: 150
+        main_profile_image_url:
+          type: string
       required:
       - id
   securitySchemes:

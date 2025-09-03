@@ -22,3 +22,10 @@ class UserUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.User
         exclude = ['date_joined', 'email', 'groups', 'is_active', 'is_staff', 'is_superuser', 'last_login', 'password', 'user_permissions', 'username']
+
+
+class UserUpdateSelfSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.User
+        exclude = ['date_joined', 'email', 'groups', 'is_active', 'is_staff', 'is_superuser', 'last_login', 'password', 'user_permissions', 'username']
