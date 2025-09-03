@@ -65,7 +65,6 @@ paths:
       - v1
       security:
       - jwtAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -115,7 +114,6 @@ paths:
       - v1
       security:
       - jwtAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -205,6 +203,73 @@ paths:
       responses:
         '204':
           description: No response body
+  /api/v1/organizations{id}/add_member/:
+    put:
+      operationId: v1_organizations_add_member_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this organization.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrganizationAddRemoveMember'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/OrganizationAddRemoveMember'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/OrganizationAddRemoveMember'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationAddRemoveMember'
+          description: ''
+  /api/v1/organizations{id}/remove_member/:
+    put:
+      operationId: v1_organizations_remove_member_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this organization.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Organization'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Organization'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Organization'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organization'
+          description: ''
   /api/v1/organizations/{organization_id}/projects:
     get:
       operationId: v1_organizations_projects_list
@@ -424,6 +489,7 @@ paths:
       - v1
       security:
       - jwtAuth: []
+      - {}
       responses:
         '200':
           content:
@@ -583,12 +649,30 @@ components:
         owner:
           type: string
           format: uuid
+        admins:
+          type: array
+          items:
+            type: string
+            format: uuid
+        members:
+          type: array
+          items:
+            type: string
+            format: uuid
       required:
       - created_at
       - id
       - name
       - owner
       - updated_at
+    OrganizationAddRemoveMember:
+      type: object
+      properties:
+        members:
+          type: array
+          items:
+            type: string
+            format: uuid
     OrganizationCreate:
       type: object
       properties:
@@ -612,6 +696,16 @@ components:
         name:
           type: string
           maxLength: 255
+        admins:
+          type: array
+          items:
+            type: string
+            format: uuid
+        members:
+          type: array
+          items:
+            type: string
+            format: uuid
       required:
       - id
       - name
@@ -659,6 +753,16 @@ components:
         owner:
           type: string
           format: uuid
+        admins:
+          type: array
+          items:
+            type: string
+            format: uuid
+        members:
+          type: array
+          items:
+            type: string
+            format: uuid
     PatchedProject:
       type: object
       properties:

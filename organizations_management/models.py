@@ -11,7 +11,9 @@ class Organization(models.Model):
     name = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='organizations')
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='organizations_ownership')
+    admins = models.ManyToManyField(User, blank=True, related_name='organizations_administratorship')
+    members = models.ManyToManyField(User, blank=True, related_name='organizations_membership')
 
 
 # TODO: check ways of performing soft on_delete

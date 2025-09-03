@@ -6,13 +6,20 @@ from organizations_management import models
 class OrganizationCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Organization
-        exclude = ['created_at', 'updated_at', 'owner']
+        exclude = ['created_at', 'updated_at', 'owner', 'members', 'admins']
 
 
 class OrganizationUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Organization
         exclude = ['created_at', 'updated_at', 'owner']
+
+
+class OrganizationAddRemoveMemberSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.Organization
+        fields = ['members']
 
 
 class OrganizationSerializer(serializers.ModelSerializer):

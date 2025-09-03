@@ -28,7 +28,7 @@ class UserViewset(viewsets.ModelViewSet):
         if self.action == 'create':
             return [drf_permissions.AllowAny()]
         if self.action == 'list':
-            return [drf_permissions.IsAdminUser()]
+            return [drf_permissions.AllowAny()]
         return [permissions.IsAdminOrSelf()]
 
     def get_serializer_class(self):
