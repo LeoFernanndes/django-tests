@@ -10,5 +10,6 @@ router.register(r'', v1_views.UserViewset, basename='users')
 
 urlpatterns = [
     path('users/', include(router.urls)),
+    path('users/generate-upload-profile-image-presigned-url', v1_views.UserImageUploadView.as_view(), name='generate-upload-profile-image-presigned-url')
 ]
 
