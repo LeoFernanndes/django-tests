@@ -8,6 +8,11 @@ on:
 
 env:
   ENVIRONMENT: "local"
+  S3_LOCAL_BUCKET_HOST: "http://127.0.0.1:9000/"
+  S3_LOCAL_KEYID: "AKIAIOSFODNN7EXAMPLE"
+  S3_LOCAL_KEYSECRET: "wJalrXUtnFEMIK7MDENGbPxRfiCYEXAMPLEKEY" 
+  AWS_REGION: "us-east-1"
+  USER_PROFILE_IMAGES_BUCKET: "user-profile-images"
 
 jobs:
   build:
