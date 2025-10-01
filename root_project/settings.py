@@ -14,6 +14,8 @@ import os
 from datetime import timedelta
 from pathlib import Path
 
+import boto3
+
 from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -52,7 +54,8 @@ INSTALLED_APPS = [
     'corsheaders',
 
     'users',
-    'organizations_management'
+    'organizations_management',
+    'files',
 
 ]
 
@@ -197,4 +200,17 @@ LOGGING = {
 
 
 #
-ENVIRONMENT = config('ENVIRONMENT')
+ENVIRONMENT = config('ENVIRONMENT', 'local')
+
+
+### AWS ###
+AWS_REGION = config('AWS_REGION', 'us-east-1')
+if ENVIRONMENT == 'local':
+    S3_CLIENT = boto3.client(
+        's3',
+        endpoint_url=config('S3_LOCAL_BUCKET_HOST'),
+        aws_access_key_id=config('S3_LOCAL_KEYID'),
+        aws_secret_access_key=config('S3_LOCAL_KEYSECRET'),
+    )
+else:
+    S3_CLIENT = boto3.client('s3')

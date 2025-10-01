@@ -2,7 +2,16 @@ import uuid
 
 from django.db import models
 
+from organizations_management.helpers import create_bucket
 from users.models import User
+
+
+class OrganizationManager(models.Manager):
+
+    def create(self, **kwargs):
+        organization =  super().create(**kwargs)
+        create_bucket(f'organization-{organization.id}')
+        return organization
 
 
 # Create your models here.
@@ -14,6 +23,8 @@ class Organization(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='organizations_ownership')
     admins = models.ManyToManyField(User, blank=True, related_name='organizations_administratorship')
     members = models.ManyToManyField(User, blank=True, related_name='organizations_membership')
+
+    objects = OrganizationManager()
 
 
 # TODO: check ways of performing soft on_delete
