@@ -4,8 +4,22 @@
 ## Dependencies  
 Python 3.11.9  
 
-## Use Cases  
-### Organizations  
+## Implemented Use Cases  
+### Accounts Management
+`[  ]` User can create an account  
+`[  ]` User can authenticate using username + password  
+`[  ]` User can authenticate using otp/link on the email  
+`[  ]` User can authenticate using auth providers  
+`[  ]` User can delete its account  
+`[  ]` User can reset password using otp on the email  
+`[  ]` User can add/update a profile picture  
+`[  ]` User can setup a two-factor verification  
+
+### LLM Data Sources (Files) Manipulation
+`[  ]` User can upload a data source in pdf, txt, and md formats  
+`[  ]` User can select in runtime what data sources to use in each retrieval  
+
+### Organizations
 `[  ]` User can create organizations  
 `[  ]` User can list organizations  
 `[  ]` Organization admin can invite users  
