@@ -1,10 +1,17 @@
+from decouple import config
+from drf_spectacular.utils import extend_schema
 from django.shortcuts import render
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import decorators, filters, generics, mixins, pagination, response, permissions as drf_permissions, viewsets
+from rest_framework import decorators, filters, generics, mixins, pagination, response, permissions as drf_permissions, views, viewsets
 
+from files import models as files_models
+from organizations_management.helpers import generate_upload_presigned_url
 from users import models
 from users import permissions
 from users.serializers import v1_serializers
+
+
+USER_PROFILE_IMAGES_BUCKET  = config('USER_PROFILE_IMAGES_BUCKET')
 
 
 class DefaultPageNumberPaginationClass(pagination.PageNumberPagination):
@@ -65,3 +72,25 @@ class UserViewset(viewsets.ModelViewSet):
             instance._prefetched_objects_cache = {}
 
         return response.Response(serializer.data)
+
+
+class UserImageUploadView(views.APIView):
+
+    permission_classes = [drf_permissions.IsAuthenticated]
+
+    @extend_schema(
+            request=v1_serializers.GenerateProfileImageUploadUrlSerializer,
+            responses={
+                200: v1_serializers.ProfileImageUploadUrlSerializer
+            }
+    )
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        serializer = v1_serializers.GenerateProfileImageUploadUrlSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        key = f'{user.id}/{serializer.data["filename"]}'
+        file = files_models.File(filename=serializer.data["filename"], filetype='image', bucket=USER_PROFILE_IMAGES_BUCKET, location=key)
+        file.save()
+        presigned_url = generate_upload_presigned_url(bucket_name=USER_PROFILE_IMAGES_BUCKET, location=key, content_type=serializer.data['content_type'], expiration=900)
+        response_serializer = v1_serializers.ProfileImageUploadUrlSerializer({'url': presigned_url, 'file_id': file.id})
+        return response.Response(response_serializer.data)

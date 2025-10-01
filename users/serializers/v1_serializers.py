@@ -31,3 +31,12 @@ class UserUpdateSelfSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.User
         exclude = ['date_joined', 'email', 'groups', 'is_active', 'is_staff', 'is_superuser', 'last_login', 'password', 'user_permissions', 'username']
+
+
+class GenerateProfileImageUploadUrlSerializer(serializers.Serializer):
+    filename = serializers.CharField()
+    content_type = serializers.CharField()
+
+class ProfileImageUploadUrlSerializer(serializers.Serializer):
+    url = serializers.CharField()
+    file_id = serializers.CharField()

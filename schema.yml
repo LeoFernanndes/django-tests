@@ -58,36 +58,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/TokenRefresh'
           description: ''
-  /api/v1/:
+  /api/v1/files/:
     get:
-      operationId: v1_list
-      parameters:
-      - in: query
-        name: is_active
-        schema:
-          type: boolean
-      - in: query
-        name: is_staff
-        schema:
-          type: boolean
-      - name: ordering
-        required: false
-        in: query
-        description: Which field to use when ordering the results.
-        schema:
-          type: string
-      - name: page
-        required: false
-        in: query
-        description: A page number within the paginated result set.
-        schema:
-          type: integer
-      - name: page_size
-        required: false
-        in: query
-        description: Number of results to return per page.
-        schema:
-          type: integer
+      operationId: v1_files_list
       tags:
       - v1
       security:
@@ -98,23 +71,25 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedUserList'
+                type: array
+                items:
+                  $ref: '#/components/schemas/File'
           description: ''
     post:
-      operationId: v1_create
+      operationId: v1_files_create
       tags:
       - v1
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserCreate'
+              $ref: '#/components/schemas/FileCreate'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/UserCreate'
+              $ref: '#/components/schemas/FileCreate'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/UserCreate'
+              $ref: '#/components/schemas/FileCreate'
         required: true
       security:
       - jwtAuth: []
@@ -124,39 +99,38 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserCreate'
+                $ref: '#/components/schemas/FileCreate'
           description: ''
-  /api/v1/{id}/:
+  /api/v1/files/{id}/:
     get:
-      operationId: v1_retrieve
+      operationId: v1_files_retrieve
       parameters:
       - in: path
         name: id
         schema:
           type: string
-          format: uuid
-        description: A UUID string identifying this user.
+        description: A unique value identifying this file.
         required: true
       tags:
       - v1
       security:
       - jwtAuth: []
+      - {}
       responses:
         '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/File'
           description: ''
     put:
-      operationId: v1_update
+      operationId: v1_files_update
       parameters:
       - in: path
         name: id
         schema:
           type: string
-          format: uuid
-        description: A UUID string identifying this user.
+        description: A unique value identifying this file.
         required: true
       tags:
       - v1
@@ -164,31 +138,32 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserUpdate'
+              $ref: '#/components/schemas/File'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/UserUpdate'
+              $ref: '#/components/schemas/File'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/UserUpdate'
+              $ref: '#/components/schemas/File'
+        required: true
       security:
       - jwtAuth: []
+      - {}
       responses:
         '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserUpdate'
+                $ref: '#/components/schemas/File'
           description: ''
     patch:
-      operationId: v1_partial_update
+      operationId: v1_files_partial_update
       parameters:
       - in: path
         name: id
         schema:
           type: string
-          format: uuid
-        description: A UUID string identifying this user.
+        description: A unique value identifying this file.
         required: true
       tags:
       - v1
@@ -196,39 +171,62 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchedUser'
+              $ref: '#/components/schemas/PatchedFile'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/PatchedUser'
+              $ref: '#/components/schemas/PatchedFile'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/PatchedUser'
+              $ref: '#/components/schemas/PatchedFile'
       security:
       - jwtAuth: []
+      - {}
       responses:
         '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/File'
           description: ''
     delete:
-      operationId: v1_destroy
+      operationId: v1_files_destroy
       parameters:
       - in: path
         name: id
         schema:
           type: string
-          format: uuid
-        description: A UUID string identifying this user.
+        description: A unique value identifying this file.
         required: true
       tags:
       - v1
       security:
       - jwtAuth: []
+      - {}
       responses:
         '204':
           description: No response body
+  /api/v1/files/{id}/get_download_presigned_url/:
+    get:
+      operationId: v1_files_get_download_presigned_url_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        description: A unique value identifying this file.
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/File'
+          description: ''
   /api/v1/organizations:
     get:
       operationId: v1_organizations_list
@@ -625,45 +623,6 @@ paths:
       responses:
         '204':
           description: No response body
-  /api/v1/retrieve_self/:
-    get:
-      operationId: v1_retrieve_self_retrieve
-      tags:
-      - v1
-      security:
-      - jwtAuth: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/User'
-          description: ''
-  /api/v1/update_self/:
-    post:
-      operationId: v1_update_self_create
-      tags:
-      - v1
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UserUpdateSelf'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/UserUpdateSelf'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/UserUpdateSelf'
-      security:
-      - jwtAuth: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserUpdateSelf'
-          description: ''
   /api/v1/users/:
     get:
       operationId: v1_users_list
@@ -835,6 +794,32 @@ paths:
       responses:
         '204':
           description: No response body
+  /api/v1/users/generate-upload-profile-image-presigned-url:
+    post:
+      operationId: v1_users_generate_upload_profile_image_presigned_url_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenerateProfileImageUploadUrl'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/GenerateProfileImageUploadUrl'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/GenerateProfileImageUploadUrl'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfileImageUploadUrl'
+          description: ''
   /api/v1/users/retrieve_self/:
     get:
       operationId: v1_users_retrieve_self_retrieve
@@ -876,6 +861,70 @@ paths:
           description: ''
 components:
   schemas:
+    File:
+      type: object
+      properties:
+        id:
+          type: string
+          maxLength: 255
+        presigned_url:
+          type: string
+          readOnly: true
+        filename:
+          type: string
+        filetype:
+          $ref: '#/components/schemas/FiletypeEnum'
+        bucket:
+          type: string
+          maxLength: 255
+        location:
+          type: string
+      required:
+      - bucket
+      - filename
+      - filetype
+      - id
+      - location
+      - presigned_url
+    FileCreate:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        filename:
+          type: string
+        filetype:
+          $ref: '#/components/schemas/FiletypeEnum'
+        bucket:
+          type: string
+          maxLength: 255
+        location:
+          type: string
+      required:
+      - bucket
+      - filename
+      - filetype
+      - id
+      - location
+    FiletypeEnum:
+      enum:
+      - IMAGE
+      - VIDEO
+      type: string
+      description: |-
+        * `IMAGE` - Image
+        * `VIDEO` - Video
+    GenerateProfileImageUploadUrl:
+      type: object
+      properties:
+        filename:
+          type: string
+        content_type:
+          type: string
+      required:
+      - content_type
+      - filename
     Organization:
       type: object
       properties:
@@ -980,6 +1029,24 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/User'
+    PatchedFile:
+      type: object
+      properties:
+        id:
+          type: string
+          maxLength: 255
+        presigned_url:
+          type: string
+          readOnly: true
+        filename:
+          type: string
+        filetype:
+          $ref: '#/components/schemas/FiletypeEnum'
+        bucket:
+          type: string
+          maxLength: 255
+        location:
+          type: string
     PatchedOrganization:
       type: object
       properties:
@@ -1070,6 +1137,16 @@ components:
           format: date-time
         main_profile_image_url:
           type: string
+    ProfileImageUploadUrl:
+      type: object
+      properties:
+        url:
+          type: string
+        file_id:
+          type: string
+      required:
+      - file_id
+      - url
     Project:
       type: object
       properties:
@@ -1205,7 +1282,7 @@ components:
           readOnly: true
         password:
           type: string
-          maxLength: 128
+          writeOnly: true
         username:
           type: string
           description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
