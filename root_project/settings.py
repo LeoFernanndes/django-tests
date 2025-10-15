@@ -22,6 +22,10 @@ from decouple import config
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
+#
+ENVIRONMENT = config('ENVIRONMENT', 'local')
+
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
@@ -36,6 +40,19 @@ ALLOWED_HOSTS = ['localhost', '127.0.0.1'] # TODO: tighten wildcard when in prod
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
 ]
+
+CORS_ALLOW_CREDENTIALS = True
+
+if ENVIRONMENT == 'local':
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
+else:
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+
+SESSION_COOKIE_SAMESITE = 'Lax' # default
+CSRF_COOKIE_SAMESITE = 'Lax' # default
+
 
 # Application definition
 
@@ -150,6 +167,7 @@ AUTH_USER_MODEL = 'users.User'
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'users.authentication.cookie_jwt_authentication.CookieJWTAuthentication'
     ),
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
@@ -157,6 +175,11 @@ REST_FRAMEWORK = {
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': SECRET_KEY,
+    'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
 
@@ -199,8 +222,7 @@ LOGGING = {
 }
 
 
-#
-ENVIRONMENT = config('ENVIRONMENT', 'local')
+
 
 
 ### AWS ###

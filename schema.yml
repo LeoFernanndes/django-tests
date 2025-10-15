@@ -58,6 +58,57 @@ paths:
               schema:
                 $ref: '#/components/schemas/TokenRefresh'
           description: ''
+  /api/v1/api/auth/login/:
+    post:
+      operationId: v1_api_auth_login_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginCookieToken'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LoginCookieToken'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LoginCookieToken'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginCookieToken'
+          description: ''
+  /api/v1/api/auth/logout/:
+    post:
+      operationId: v1_api_auth_logout_create
+      description: Logout view that clears cookies
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/v1/api/auth/refresh/:
+    post:
+      operationId: v1_api_auth_refresh_create
+      description: Refresh access token using refresh token from cookie
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
   /api/v1/files/:
     get:
       operationId: v1_files_list
@@ -121,7 +172,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/File'
+                $ref: '#/components/schemas/FileRetrieve'
           description: ''
     put:
       operationId: v1_files_update
@@ -867,9 +918,6 @@ components:
         id:
           type: string
           maxLength: 255
-        presigned_url:
-          type: string
-          readOnly: true
         filename:
           type: string
         filetype:
@@ -885,7 +933,6 @@ components:
       - filetype
       - id
       - location
-      - presigned_url
     FileCreate:
       type: object
       properties:
@@ -907,6 +954,31 @@ components:
       - filetype
       - id
       - location
+    FileRetrieve:
+      type: object
+      properties:
+        id:
+          type: string
+          maxLength: 255
+        presigned_url:
+          type: string
+          readOnly: true
+        filename:
+          type: string
+        filetype:
+          $ref: '#/components/schemas/FiletypeEnum'
+        bucket:
+          type: string
+          maxLength: 255
+        location:
+          type: string
+      required:
+      - bucket
+      - filename
+      - filetype
+      - id
+      - location
+      - presigned_url
     FiletypeEnum:
       enum:
       - IMAGE
@@ -925,6 +997,16 @@ components:
       required:
       - content_type
       - filename
+    LoginCookieToken:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      required:
+      - password
+      - username
     Organization:
       type: object
       properties:
@@ -1035,9 +1117,6 @@ components:
         id:
           type: string
           maxLength: 255
-        presigned_url:
-          type: string
-          readOnly: true
         filename:
           type: string
         filetype:
@@ -1228,7 +1307,6 @@ components:
           readOnly: true
         refresh:
           type: string
-          writeOnly: true
       required:
       - access
       - refresh
