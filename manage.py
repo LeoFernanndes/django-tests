@@ -7,6 +7,11 @@ import sys
 def main():
     """Run administrative tasks."""
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'root_project.settings')
+
+    # Setup OpenTelemetry before Django starts
+    from monitoring.open_telemetry import setup_telemetry
+    setup_telemetry()
+
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:
