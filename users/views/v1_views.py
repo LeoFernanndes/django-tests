@@ -1,8 +1,11 @@
 from decouple import config
-from drf_spectacular.utils import extend_schema
+from django.conf import settings
+from django.contrib.auth import authenticate
 from django.shortcuts import render
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import decorators, filters, generics, mixins, pagination, response, permissions as drf_permissions, views, viewsets
+from drf_spectacular.utils import extend_schema
+from rest_framework import decorators, filters, generics, mixins, pagination, response, permissions as drf_permissions, status, views, viewsets
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from files import models as files_models
 from organizations_management.helpers import generate_upload_presigned_url
@@ -94,3 +97,127 @@ class UserImageUploadView(views.APIView):
         presigned_url = generate_upload_presigned_url(bucket_name=USER_PROFILE_IMAGES_BUCKET, location=key, content_type=serializer.data['content_type'], expiration=900)
         response_serializer = v1_serializers.ProfileImageUploadUrlSerializer({'url': presigned_url, 'file_id': file.id})
         return response.Response(response_serializer.data)
+
+
+class LoginView(generics.GenericAPIView):
+    serializer_class = v1_serializers.LoginCookieTokenSerializer
+    """
+    Custom login view that sets JWT tokens in httpOnly cookies
+    """
+    def post(self, request):
+        username = request.data.get('username')
+        password = request.data.get('password')
+        
+        user = authenticate(username=username, password=password)
+        
+        if user is not None:
+            # Generate tokens
+            refresh = RefreshToken.for_user(user)
+            access_token = str(refresh.access_token)
+            refresh_token = str(refresh)
+            
+            # Create response
+            _response = response.Response({
+                'message': 'Login successful',
+                'user': {
+                    'id': user.id,
+                    'username': user.username,
+                    'email': user.email,
+                }
+            }, status=status.HTTP_200_OK)
+            
+            # Set access token in httpOnly cookie
+            _response.set_cookie(
+                key='access_token',
+                value=access_token,
+                httponly=True,  # Prevents JavaScript access
+                secure=settings.SESSION_COOKIE_SECURE,  # HTTPS only in production
+                samesite='Lax',  # CSRF protection
+                max_age=60 * 15,  # 15 minutes
+            )
+            
+            # Set refresh token in httpOnly cookie
+            _response.set_cookie(
+                key='refresh_token',
+                value=refresh_token,
+                httponly=True,
+                secure=settings.SESSION_COOKIE_SECURE,
+                samesite='Lax',
+                max_age=60 * 60 * 24 * 7,  # 7 days
+            )
+            
+            return _response
+        
+        return response.Response(
+            {'error': 'Invalid credentials'},
+            status=status.HTTP_401_UNAUTHORIZED
+        )
+
+
+class RefreshTokenView(generics.GenericAPIView):
+    """
+    Refresh access token using refresh token from cookie
+    """
+    def post(self, request):
+        refresh_token = request.COOKIES.get('refresh_token')
+        
+        if not refresh_token:
+            return response.Response(
+                {'error': 'Refresh token not found'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+        
+        try:
+            refresh = RefreshToken(refresh_token)
+            access_token = str(refresh.access_token)
+            
+            _response = response.Response({
+                'message': 'Token refreshed'
+            }, status=status.HTTP_200_OK)
+            
+            # Set new access token
+            _response.set_cookie(
+                key='access_token',
+                value=access_token,
+                httponly=True,
+                secure=settings.SESSION_COOKIE_SECURE,
+                samesite='Lax',
+                max_age=60 * 15,
+            )
+            
+            # Optionally rotate refresh token
+            if settings.SIMPLE_JWT.get('ROTATE_REFRESH_TOKENS'):
+                new_refresh_token = str(refresh)
+                _response.set_cookie(
+                    key='refresh_token',
+                    value=new_refresh_token,
+                    httponly=True,
+                    secure=settings.SESSION_COOKIE_SECURE,
+                    samesite='Lax',
+                    max_age=60 * 60 * 24 * 7,
+                )
+            
+            return _response
+            
+        except Exception as e:
+            return response.Response(
+                {'error': 'Invalid refresh token'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+
+class LogoutView(generics.GenericAPIView):
+    """
+    Logout view that clears cookies
+    """
+    
+    def post(self, request):
+        _response = response.Response({
+            'message': 'Logout successful'
+        }, status=status.HTTP_200_OK)
+        
+        # Delete cookiess
+        _response.delete_cookie('access_token')
+        _response.delete_cookie('refresh_token')
+        
+        return _response

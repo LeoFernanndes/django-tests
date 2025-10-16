@@ -40,3 +40,8 @@ class GenerateProfileImageUploadUrlSerializer(serializers.Serializer):
 class ProfileImageUploadUrlSerializer(serializers.Serializer):
     url = serializers.CharField()
     file_id = serializers.CharField()
+
+
+class LoginCookieTokenSerializer(serializers.Serializer):
+    username = serializers.CharField()
+    password = serializers.CharField()
