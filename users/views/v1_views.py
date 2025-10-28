@@ -14,7 +14,7 @@ from users import permissions
 from users.serializers import v1_serializers
 
 
-USER_PROFILE_IMAGES_BUCKET  = config('USER_PROFILE_IMAGES_BUCKET')
+USER_PROFILE_IMAGES_BUCKET  = config('USER_PROFILE_IMAGES_BUCKET', None)
 
 
 class DefaultPageNumberPaginationClass(pagination.PageNumberPagination):

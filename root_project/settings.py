@@ -230,9 +230,9 @@ AWS_REGION = config('AWS_REGION', 'us-east-1')
 if ENVIRONMENT == 'local':
     S3_CLIENT = boto3.client(
         's3',
-        endpoint_url=config('S3_LOCAL_BUCKET_HOST'),
-        aws_access_key_id=config('S3_LOCAL_KEYID'),
-        aws_secret_access_key=config('S3_LOCAL_KEYSECRET'),
+        endpoint_url=config('S3_LOCAL_BUCKET_HOST', None),
+        aws_access_key_id=config('S3_LOCAL_KEYID', None),
+        aws_secret_access_key=config('S3_LOCAL_KEYSECRET', None),
     )
 else:
     S3_CLIENT = boto3.client('s3')
