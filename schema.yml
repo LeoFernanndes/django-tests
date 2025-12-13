@@ -58,57 +58,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/TokenRefresh'
           description: ''
-  /api/v1/api/auth/login/:
-    post:
-      operationId: v1_api_auth_login_create
-      tags:
-      - v1
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/LoginCookieToken'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/LoginCookieToken'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/LoginCookieToken'
-        required: true
-      security:
-      - jwtAuth: []
-      - {}
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/LoginCookieToken'
-          description: ''
-  /api/v1/api/auth/logout/:
-    post:
-      operationId: v1_api_auth_logout_create
-      description: Logout view that clears cookies
-      tags:
-      - v1
-      security:
-      - jwtAuth: []
-      - {}
-      responses:
-        '200':
-          description: No response body
-  /api/v1/api/auth/refresh/:
-    post:
-      operationId: v1_api_auth_refresh_create
-      description: Refresh access token using refresh token from cookie
-      tags:
-      - v1
-      security:
-      - jwtAuth: []
-      - {}
-      responses:
-        '200':
-          description: No response body
   /api/v1/files/:
     get:
       operationId: v1_files_list
@@ -845,6 +794,66 @@ paths:
       responses:
         '204':
           description: No response body
+  /api/v1/users/auth/login/:
+    post:
+      operationId: v1_users_auth_login_create
+      description: Refresh token on cookies.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginCookieToken'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LoginCookieToken'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LoginCookieToken'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Login'
+          description: ''
+  /api/v1/users/auth/logout/:
+    post:
+      operationId: v1_users_auth_logout_create
+      description: Logout user.
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Logout'
+          description: ''
+  /api/v1/users/auth/refresh/:
+    post:
+      operationId: v1_users_auth_refresh_create
+      description: Refresh tokens on cookies.
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RefreshToken'
+          description: ''
   /api/v1/users/generate-upload-profile-image-presigned-url:
     post:
       operationId: v1_users_generate_upload_profile_image_presigned_url_create
@@ -997,6 +1006,16 @@ components:
       required:
       - content_type
       - filename
+    Login:
+      type: object
+      properties:
+        message:
+          type: string
+        user:
+          $ref: '#/components/schemas/LoginCookieUserResponse'
+      required:
+      - message
+      - user
     LoginCookieToken:
       type: object
       properties:
@@ -1007,6 +1026,28 @@ components:
       required:
       - password
       - username
+    LoginCookieUserResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        username:
+          type: string
+      required:
+      - email
+      - id
+      - username
+    Logout:
+      type: object
+      properties:
+        message:
+          type: string
+      required:
+      - message
     Organization:
       type: object
       properties:
@@ -1279,6 +1320,13 @@ components:
       required:
       - id
       - name
+    RefreshToken:
+      type: object
+      properties:
+        message:
+          type: string
+      required:
+      - message
     TokenObtainPair:
       type: object
       properties:

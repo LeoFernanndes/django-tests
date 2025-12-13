@@ -3,18 +3,26 @@ from django.conf import settings
 from django.contrib.auth import authenticate
 from django.shortcuts import render
 from django_filters.rest_framework import DjangoFilterBackend
-from drf_spectacular.utils import extend_schema
-from rest_framework import decorators, filters, generics, mixins, pagination, response, permissions as drf_permissions, status, views, viewsets
+from drf_spectacular.utils import OpenApiTypes, extend_schema, inline_serializer
+from rest_framework import (
+    decorators,
+    filters,
+    generics,
+    mixins,
+    pagination,
+    response,
+    status,
+    views,
+    viewsets,
+)
+from rest_framework import permissions as drf_permissions
+from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from files import models as files_models
 from organizations_management.helpers import generate_upload_presigned_url
-from users import models
-from users import permissions
+from users import models, permissions
 from users.serializers import v1_serializers
-
-
-USER_PROFILE_IMAGES_BUCKET  = config('USER_PROFILE_IMAGES_BUCKET', None)
 
 
 class DefaultPageNumberPaginationClass(pagination.PageNumberPagination):
@@ -92,13 +100,26 @@ class UserImageUploadView(views.APIView):
         serializer = v1_serializers.GenerateProfileImageUploadUrlSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         key = f'{user.id}/{serializer.data["filename"]}'
-        file = files_models.File(filename=serializer.data["filename"], filetype='image', bucket=USER_PROFILE_IMAGES_BUCKET, location=key)
+        file = files_models.File(filename=serializer.data["filename"], filetype='image', bucket=settings.USER_PROFILE_IMAGES_BUCKET, location=key)
         file.save()
-        presigned_url = generate_upload_presigned_url(bucket_name=USER_PROFILE_IMAGES_BUCKET, location=key, content_type=serializer.data['content_type'], expiration=900)
+        presigned_url = generate_upload_presigned_url(bucket_name=settings.USER_PROFILE_IMAGES_BUCKET, location=key, content_type=serializer.data['content_type'], expiration=900)
         response_serializer = v1_serializers.ProfileImageUploadUrlSerializer({'url': presigned_url, 'file_id': file.id})
         return response.Response(response_serializer.data)
 
 
+@extend_schema(
+    # Set request to None to indicate no request body
+    responses={
+        status.HTTP_200_OK: inline_serializer(
+            name="LoginSerializer", # The generated schema name
+            fields={
+                "message": serializers.CharField(),
+                "user": v1_serializers.LoginCookieUserResponseSerializer()
+            }
+        ), 
+    },
+    description="Refresh token on cookies.",
+)
 class LoginView(generics.GenericAPIView):
     serializer_class = v1_serializers.LoginCookieTokenSerializer
     """
@@ -154,10 +175,21 @@ class LoginView(generics.GenericAPIView):
         )
 
 
+@extend_schema(
+    # Set request to None to indicate no request body
+    request=None,
+    responses={
+        status.HTTP_200_OK: inline_serializer(
+            name="RefreshTokenSerializer", # The generated schema name
+            fields={
+                "message": serializers.CharField(),
+            }
+        ), 
+    },
+    description="Refresh tokens on cookies.",
+)
 class RefreshTokenView(generics.GenericAPIView):
-    """
-    Refresh access token using refresh token from cookie
-    """
+    """Refresh access token using refresh token from cookie."""
     def post(self, request):
         refresh_token = request.COOKIES.get('refresh_token')
         
@@ -206,10 +238,21 @@ class RefreshTokenView(generics.GenericAPIView):
             )
 
 
+@extend_schema(
+    # Set request to None to indicate no request body
+    request=None,
+    responses={
+        status.HTTP_200_OK: inline_serializer(
+            name="LogoutSerializer", # The generated schema name
+            fields={
+                "message": serializers.CharField(),
+            }
+        ), 
+    },
+    description="Logout user.",
+)
 class LogoutView(generics.GenericAPIView):
-    """
-    Logout view that clears cookies
-    """
+    """Logout view that clears cookies."""
     
     def post(self, request):
         _response = response.Response({

@@ -4,6 +4,9 @@
 ## Dependencies  
 Python 3.11.9  
 
+## To do
+`[  ]` Address drf spectacular warnings
+
 ## Implemented Use Cases  
 ### Accounts Management
 `[  ]` User can create an account  

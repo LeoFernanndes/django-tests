@@ -45,3 +45,9 @@ class ProfileImageUploadUrlSerializer(serializers.Serializer):
 class LoginCookieTokenSerializer(serializers.Serializer):
     username = serializers.CharField()
     password = serializers.CharField()
+
+
+class LoginCookieUserResponseSerializer(serializers.Serializer):
+    id = serializers.UUIDField()
+    email = serializers.EmailField()
+    username = serializers.CharField()
