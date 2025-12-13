@@ -247,3 +247,6 @@ if ENVIRONMENT == 'local':
     )
 else:
     S3_CLIENT = boto3.client('s3')
+
+
+USER_PROFILE_IMAGES_BUCKET  = os.environ.get('USER_PROFILE_IMAGES_BUCKET') 
