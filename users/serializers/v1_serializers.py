@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from users import models 
+from files import models as files_models
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -33,9 +34,10 @@ class UserUpdateSelfSerializer(serializers.ModelSerializer):
         exclude = ['date_joined', 'email', 'groups', 'is_active', 'is_staff', 'is_superuser', 'last_login', 'password', 'user_permissions', 'username']
 
 
-class GenerateProfileImageUploadUrlSerializer(serializers.Serializer):
-    filename = serializers.CharField()
-    content_type = serializers.CharField()
+class GenerateProfileImageUploadUrlSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = files_models.File
+        fields = ['filename', 'mime_type']
 
 class ProfileImageUploadUrlSerializer(serializers.Serializer):
     url = serializers.CharField()
@@ -45,3 +47,9 @@ class ProfileImageUploadUrlSerializer(serializers.Serializer):
 class LoginCookieTokenSerializer(serializers.Serializer):
     username = serializers.CharField()
     password = serializers.CharField()
+
+
+class LoginCookieUserResponseSerializer(serializers.Serializer):
+    id = serializers.UUIDField()
+    email = serializers.EmailField()
+    username = serializers.CharField()

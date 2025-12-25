@@ -4,6 +4,10 @@
 ## Dependencies  
 Python 3.11.9  
 
+## To do
+`[  ]` Address drf spectacular warnings
+`[  ]` Add ids to files to avoid overriding keys on the bucket 
+
 ## Implemented Use Cases  
 ### Accounts Management
 `[  ]` User can create an account  

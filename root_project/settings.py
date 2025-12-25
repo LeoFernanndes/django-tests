@@ -17,6 +17,11 @@ from pathlib import Path
 import boto3
 
 from decouple import config
+from dotenv import load_dotenv
+
+
+load_dotenv()
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -40,6 +45,8 @@ ALLOWED_HOSTS = ['localhost', '127.0.0.1'] # TODO: tighten wildcard when in prod
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
 ]
+
+CORS_ALLOW_ALL_ORIGINS=DEBUG
 
 CORS_ALLOW_CREDENTIALS = True
 
@@ -113,9 +120,13 @@ WSGI_APPLICATION = 'root_project.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.environ.get('POSTGRES_DB'),
+            'USER': os.environ.get('POSTGRES_USER'),
+            'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
+            'HOST': os.environ.get('POSTGRES_HOST'),  # Or the IP address of your PostgreSQL server
+            'PORT': os.environ.get('POSTGRES_PORT'),       # Default PostgreSQL port
+        }
 }
 
 
@@ -230,9 +241,13 @@ AWS_REGION = config('AWS_REGION', 'us-east-1')
 if ENVIRONMENT == 'local':
     S3_CLIENT = boto3.client(
         's3',
-        endpoint_url=config('S3_LOCAL_BUCKET_HOST'),
-        aws_access_key_id=config('S3_LOCAL_KEYID'),
-        aws_secret_access_key=config('S3_LOCAL_KEYSECRET'),
+        endpoint_url=config('S3_LOCAL_BUCKET_HOST', None),
+        aws_access_key_id=config('S3_LOCAL_KEYID', None),
+        aws_secret_access_key=config('S3_LOCAL_KEYSECRET', None),
     )
 else:
     S3_CLIENT = boto3.client('s3')
+
+
+USER_PROFILE_IMAGES_BUCKET  = os.environ.get('USER_PROFILE_IMAGES_BUCKET') 
+FILES_BUCKET = os.environ.get('FILES_BUCKET')
