@@ -1,8 +1,15 @@
-from django.shortcuts import get_object_or_404
-from rest_framework import decorators, permissions as rest_framework_permissions, response, viewsets
+from typing import Any
 
-from organizations_management import models
-from organizations_management import permissions
+from django.conf import settings
+from django.shortcuts import get_object_or_404
+from drf_spectacular.utils import extend_schema
+from rest_framework import decorators, mixins, request, response, views, viewsets
+from rest_framework import permissions as rest_framework_permissions
+
+from files import models as files_models
+from files import serializers as files_serializers
+from organizations_management import models, permissions
+from organizations_management.helpers import generate_upload_presigned_url
 from organizations_management.v1 import serializers
 
 
@@ -75,6 +82,25 @@ class OrganizationViewSet(viewsets.ModelViewSet):
         return response.Response(serializer.data)
 
 
+class OrganizationFileUploadView(views.APIView):
+
+    @extend_schema(
+            request=serializers.GenerateFileUploadUrlSerializer,
+            responses={
+                200: serializers.FileUploadUrlSerializer
+            }
+    )
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        serializer = serializers.GenerateFileUploadUrlSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        key = f"{self.request.parser_context['kwargs']['organization_id']}/{serializer.data['filename']}"
+        file = files_models.File.objects.create(filename=serializer.data["filename"], mime_type=serializer.data['mime_type'], bucket=settings.USER_PROFILE_IMAGES_BUCKET, location=key, organization_id=self.request.parser_context['kwargs']['organization_id'])
+        presigned_url = generate_upload_presigned_url(bucket_name=settings.FILES_BUCKET, location=key, content_type=serializer.data['mime_type'], expiration=900)
+        response_serializer = serializers.FileUploadUrlSerializer({'url': presigned_url, 'file_id': file.id})
+        return response.Response(response_serializer.data)
+
+
 class ProjectViewSet(viewsets.ModelViewSet):
     queryset = models.Project.objects.all()
     permission_classes = [rest_framework_permissions.IsAuthenticatedOrReadOnly]
@@ -96,3 +122,18 @@ class ProjectViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         organization = models.Organization.objects.get(id=self.request.parser_context['kwargs']['organization_id'])
         serializer.save(organization=organization)
+
+
+class OrganizationFilesViewSet(
+        mixins.RetrieveModelMixin,
+        mixins.UpdateModelMixin,
+        mixins.DestroyModelMixin,
+        mixins.ListModelMixin,
+        viewsets.GenericViewSet
+    ):
+
+    # queryset = files_models.File.objects.all()
+    serializer_class = files_serializers.FileSerializer
+    
+    def get_queryset(self):
+        return files_models.File.objects.filter(organization_id=self.request.parser_context['kwargs']['organization_id'])

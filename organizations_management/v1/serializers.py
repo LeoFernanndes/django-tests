@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from files import models as files_models
 from organizations_management import models
 
 
@@ -44,3 +45,14 @@ class ProjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Project
         fields = '__all__'
+
+
+class GenerateFileUploadUrlSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = files_models.File
+        fields = ['filename', 'mime_type']
+
+
+class FileUploadUrlSerializer(serializers.Serializer):
+    url = serializers.CharField()
+    file_id = serializers.CharField()

@@ -250,3 +250,4 @@ else:
 
 
 USER_PROFILE_IMAGES_BUCKET  = os.environ.get('USER_PROFILE_IMAGES_BUCKET') 
+FILES_BUCKET = os.environ.get('FILES_BUCKET')

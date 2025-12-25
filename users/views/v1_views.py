@@ -11,12 +11,12 @@ from rest_framework import (
     mixins,
     pagination,
     response,
+    serializers,
     status,
     views,
     viewsets,
 )
 from rest_framework import permissions as drf_permissions
-from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from files import models as files_models
@@ -100,9 +100,9 @@ class UserImageUploadView(views.APIView):
         serializer = v1_serializers.GenerateProfileImageUploadUrlSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         key = f'{user.id}/{serializer.data["filename"]}'
-        file = files_models.File(filename=serializer.data["filename"], filetype='image', bucket=settings.USER_PROFILE_IMAGES_BUCKET, location=key)
+        file = files_models.File.objects.create(filename=serializer.data["filename"], mime_type=serializer.data["mime_type"], bucket=settings.USER_PROFILE_IMAGES_BUCKET, location=key)
         file.save()
-        presigned_url = generate_upload_presigned_url(bucket_name=settings.USER_PROFILE_IMAGES_BUCKET, location=key, content_type=serializer.data['content_type'], expiration=900)
+        presigned_url = generate_upload_presigned_url(bucket_name=settings.USER_PROFILE_IMAGES_BUCKET, location=key, content_type=serializer.data['mime_type'], expiration=900)
         response_serializer = v1_serializers.ProfileImageUploadUrlSerializer({'url': presigned_url, 'file_id': file.id})
         return response.Response(response_serializer.data)
 
